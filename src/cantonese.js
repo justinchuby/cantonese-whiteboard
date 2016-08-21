@@ -1,5 +1,3 @@
-export { CantoDict, Jyutping, NotedChar }
-
 class Jyutping {
   constructor(pinyin) {
     this.pinyin = pinyin
@@ -177,3 +175,5 @@ function parse_line(line) {
   }
   return null
 }
+
+export { Jyutping, NotedChar, CantoDict }

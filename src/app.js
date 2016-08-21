@@ -1,11 +1,11 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { Editor, Raw, Mark } from 'slate';
+import { CantoDict, Jyutping, NotedChar } from './cantonese';
+import * as cantonese_dictionary from './cantonese-dictionary';
 
-import React from 'react'
-import ReactDOM from 'react-dom'
-import { Editor, Raw, Mark } from 'slate'
-import { Jyutping, NotedChar } from './cantonese'
-import CANTO_DICT from './cantonese-dictionary'
-
-cantoDict = new CantoDict(CANTO_DICT)
+console.log(Jyutping, NotedChar, CantoDict)
+let cantoDict = new CantoDict(cantonese_dictionary.CANTO_DICT)
 
 const initialState = Raw.deserialize({
   nodes: [
@@ -36,12 +36,13 @@ function paragraphBlockDecorator(text, block) {
     let char = characters.get(i)
     let { marks } = char
     let notedChar = cantoDict.getNotedChar(string[i])
-    let type = `tone_${notedChar.jyutping.tone}`
-
-    console.log(type)
-    marks = marks.add(Mark.create({ type }))
-    char = char.merge({ marks })
-    characters = characters.set(i, char)
+    if (notedChar) {
+      let type = `tone_${notedChar.jyutping.tone}`
+      console.log(type)
+      marks = marks.add(Mark.create({ type }))
+      char = char.merge({ marks })
+      characters = characters.set(i, char)
+    }
   }
   return characters.asImmutable()
 }
