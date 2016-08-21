@@ -4,7 +4,7 @@ class Jyutping {
   constructor(pinyin) {
     this.pinyin = pinyin
     let {ping, tone} = function(pinyin) {
-      let match = content.match(/([a-zA-Z]+)(\d)/)
+      let match = pinyin.match(/([a-zA-Z]+)(\d)/)
       let ping = null
       let tone = null
       if (match) {
@@ -24,29 +24,27 @@ class Jyutping {
 
 class NotedChar {
   constructor(charObj) {
-    let {char, pinyin, use_cases, explanations, is_variant,
-    is_cantonese, is_proper, is_borrwed} = charObj
-    this.char = char
+    this.char = charObj.char
     // 拼音
-    this.jyutping = new Jyutping(pinyin)
+    this.jyutping = new Jyutping(charObj.pinyin)
     // 用例
-    this.use_cases = use_cases
-    this.explanations = explanations
+    this.use_cases = charObj.use_cases || null
+    this.explanations = charObj.explanations || null
     // 异读字
-    this.is_variant = is_variant
+    this.is_variant = charObj.is_variant || null
     // 粤语用词
-    this.is_cantonese = is_cantonese
+    this.is_cantonese = charObj.is_cantonese || null
     // 专有名词
-    this.is_proper = is_proper
+    this.is_proper = charObj.is_proper || null
     // 通假字
-    this.is_borrwed = is_borrwed
+    this.is_borrwed = charObj.is_borrwed || null
   }
 }
 
 class CantoDict {
   constructor(f) {
     this.dict = {}
-    lines = f.split("\n")
+    let lines = f.split("\n")
     for (let line of lines) {
       let notedChar = parse_line(line)
       if (notedChar) {
@@ -64,17 +62,19 @@ class CantoDict {
     return this.dict[char] || null
   }
 
-  getJyutping(char) {
-    zi = lookupZi(char)
+  getNotedChar(char, in_str="") {
+    let zi = this.lookupZi(char)
     if (zi) {
-      return zi.pronounce()
+      return zi.chooseOne(in_str)
     }
+    return null
   }
 }
 
-class Zi(object){
+class Zi {
   constructor(notedChar) {
     this.char = notedChar.char
+    this.pronunciations = {}
     let pinyin = notedChar.jyutping.pinyin
     this.pronunciations[pinyin] = notedChar
   }
@@ -84,12 +84,45 @@ class Zi(object){
     this.pronunciations[pinyin] = notedChar
   }
 
-  pronounce() {
+  pronounce(in_str) {
+    return chooseOne(in_str).jyutping
+  }
+
+  chooseOne(in_str) {
     let maxWeight = 0
-    let maxWeightP = null
-    for (let notedChar in this.pronunciations) {
-      
+    let maxWeightChar = null
+    for (let key in this.pronunciations) {
+      let notedChar = this.pronunciations[key]
+      let currentWeight = 1
+      if (notedChar.use_cases) {
+        currentWeight += notedChar.use_cases.length
+        for (let use_case of notedChar.use_cases) {
+          if (use_case.includes("(")) {
+            use_case = use_case.slice(0, use_case.indexOf("("))
+          }
+          if (in_str.includes(use_case)) {
+            return notedChar
+          }
+        }
+      }
+      if (notedChar.explanations) {
+        currentWeight += notedChar.explanations.length
+      }
+      if (notedChar.is_variant) {
+        currentWeight *= 0.05
+      }
+      if (notedChar.is_cantonese) {
+        currentWeight *= 2
+      }
+      if (notedChar.is_proper) {
+        currentWeight *= 0.6
+      }
+      if (currentWeight > maxWeight) {
+        maxWeight = currentWeight
+        maxWeightChar = notedChar
+      }
     }
+    return maxWeightChar
   }
 }
 
@@ -100,7 +133,7 @@ let _re_borrowed = /同「.」字|通「.」字/
 let _re_other = /助词|助詞/
 
 function parse_line(line) {
-  let line = line.trim()
+  line = line.trim()
   let splitedLine = line.split("\t")
   if (splitedLine.length == 3) {
     let [char, pinyin, extra] = splitedLine
@@ -109,31 +142,31 @@ function parse_line(line) {
     let explanations = null
     if (extra) {
       let flag = false
-      if (_re_variant.exec(extra) {
+      if (_re_variant.exec(extra)) {
         notedChar.is_variant = true
         flag = true
       }
-      if (_re_cantonese.exec(extra) {
+      if (_re_cantonese.exec(extra)) {
         notedChar.is_cantonese = true
         flag = true
       }
-      if (_re_proper.exec(extra) {
+      if (_re_proper.exec(extra)) {
         notedChar.is_proper = true
         flag = true
       }
-      if (_re_borrowed.exec(extra) {
+      if (_re_borrowed.exec(extra)) {
         notedChar.is_borrowed = true
         flag = true
       }
-      if (_re_other.exec(extra) {
+      if (_re_other.exec(extra)) {
         flag = true
       }
-      splitedExtra = extra.split("；")
-      if splitedExtra.length > 1 && !(splitedExtra[0].startsWith("(")){
+      let splitedExtra = extra.split("；")
+      if (splitedExtra.length > 1 && !(splitedExtra[0].startsWith("("))) {
         use_cases = splitedExtra[0].split("，")
         explanations = splitedExtra.slice(1)
       } else {
-        if (flag) {
+        if (flag || splitedExtra[0].startsWith("(")) {
           explanations = splitedExtra
         } else {
           use_cases = extra.split("，")

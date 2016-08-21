@@ -15,7 +15,7 @@ const initialState = Raw.deserialize({
       nodes: [
         {
           kind: 'text',
-          text: 'A line of text in a paragraph.'
+          text: '一个字 A line of text in a paragraph.'
         }
       ]
     }
@@ -35,7 +35,7 @@ function paragraphBlockDecorator(text, block) {
   for (let i = 0; i < string.length; i++) {
     let char = characters.get(i)
     let { marks } = char
-    let notedChar = new NotedChar(string[i])
+    let notedChar = cantoDict.getNotedChar(string[i])
     let type = `tone_${notedChar.jyutping.tone}`
 
     console.log(type)
