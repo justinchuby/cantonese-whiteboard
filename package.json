@@ -1,6 +1,7 @@
 {
   "scripts": {
     "webpack": "webpack --watch",
+    "babel": "babel src --out-dir build -w",
     "server": "browser-sync --port 4000 start --server --files \"**/*.html\" \"build/**/*.css\" \"build/**/*.js\" "
   },
   "babel": {
@@ -19,6 +20,9 @@
     "babel-preset-react": "^6.11.1",
     "babel-preset-stage-0": "^6.5.0",
     "browser-sync": "^2.14.0",
+    "css-loader": "^0.23.1",
+    "extract-text-webpack-plugin": "^1.0.1",
+    "style-loader": "^0.13.1",
     "webpack": "^1.13.2"
   },
   "dependencies": {
