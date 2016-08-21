@@ -1,8 +1,8 @@
 
-import React from 'react'
-import ReactDOM from 'react-dom'
-import { Editor, Raw, Mark } from 'slate'
-import Canto from 'canto'
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { Editor, Raw, Mark } from 'slate';
+import { Jyutping, NotedChar } from './cantonese';
 
 
 const initialState = Raw.deserialize({
@@ -21,14 +21,14 @@ const initialState = Raw.deserialize({
 }, { terse: true })
 
 // Initialize a plugin for each mark...
-const plugins = [
-  MarkHotkey({ tone: 1, type: 'tone_1' }),
-  MarkHotkey({ tone: 2, type: 'tone_2' }),
-  MarkHotkey({ tone: 3, type: 'tone_3' }),
-  MarkHotkey({ tone: 4, type: 'tone_4' }),
-  MarkHotkey({ tone: 5, type: 'tone_5' }),
-  MarkHotkey({ tone: 6, type: 'tone_6' })
-]
+// const plugins = [
+//   MarkHotkey({ tone: 1, type: 'tone_1' }),
+//   MarkHotkey({ tone: 2, type: 'tone_2' }),
+//   MarkHotkey({ tone: 3, type: 'tone_3' }),
+//   MarkHotkey({ tone: 4, type: 'tone_4' }),
+//   MarkHotkey({ tone: 5, type: 'tone_5' }),
+//   MarkHotkey({ tone: 6, type: 'tone_6' })
+// ]
 
 
 /**
@@ -44,8 +44,8 @@ function codeBlockDecorator(text, block) {
   const string = text.text
   // const grammar = Prism.languages[language]
   // const tokens = Prism.tokenize(string, grammar)
-  const tokens = Canto.tokenize(string)
-  let offset = 0
+  // const tokens = Canto.tokenize(string)
+  // let offset = 0
 
   // for (const token of tokens) {
   //   if (typeof token == 'string') {
@@ -56,20 +56,15 @@ function codeBlockDecorator(text, block) {
   //   const length = offset + token.content.length
   //   const type = `${token.type}`
 
-    for (let i = 0; i < characters.length; i++) {
-      let char = characters.get(i)
-      let { marks } = char
-      let jyutping = Canto.getJyut(char)
-      // jyut = {
-      content: string,
-      tone: string,
-
-    }
-      let type = Canto.getToneFromJyut(jyut)
-      marks = marks.add(Mark.create({ type }))
-      char = char.merge({ marks })
-      characters = characters.set(i, char)
-    }
+  for (let i = 0; i < characters.length; i++) {
+    let char = characters.get(i)
+    let { marks } = char
+    let notedChar = NotedChar(char)
+    let type = `tone-${notedChar.jyutping.tone}`
+    marks = marks.add(Mark.create({ type }))
+    char = char.merge({ marks })
+    characters = characters.set(i, char)
+  }
 
   //   offset = length
   // }
@@ -81,19 +76,20 @@ class App extends React.Component {
 
   state = {
     state: initialState,
-    schema = {
+    schema: {
       nodes: {
         paragraph: {
-          render: props => <div class="board">{props.children}</div>,
-          decorate: toneHigh
-        },
+          render: props => <div className="board">{props.children}</div>,
+          decorate: codeBlockDecorator
+        }
+      },
       marks: {
-        tone_1: props => <span class="tone-1">{props.children}</span>,
-        tone_2: props => <span class="tone-2">{props.children}</span>,
-        tone_3: props => <span class="tone-3">{props.children}</span>,
-        tone_4: props => <span class="tone-4">{props.children}</span>,
-        tone_5: props => <span class="tone-5">{props.children}</span>,
-        tone_6: props => <span class="tone-6">{props.children}</span>,
+        tone_1: props => <span style="color:red;">{props.children}</span>,
+        tone_2: props => <span className="tone-2">{props.children}</span>,
+        tone_3: props => <span className="tone-3">{props.children}</span>,
+        tone_4: props => <span className="tone-4">{props.children}</span>,
+        tone_5: props => <span className="tone-5">{props.children}</span>,
+        tone_6: props => <span className="tone-6">{props.children}</span>,
       }
     }
   }
@@ -101,7 +97,6 @@ class App extends React.Component {
   render() {
     return (
       <Editor
-        plugins={plugins}
         schema={this.state.schema}
         state={this.state.state}
         onChange={state => this.setState({ state })}
@@ -112,22 +107,20 @@ class App extends React.Component {
 };
 
 
-function MarkHotkey(options) {
-  const { type, tone } = options
-
-  // Return our "plugin" object, containing the `onKeyDown` handler.
-  return {
-    onKeyDown(event, data, state) {
-
-
-      // Toggle the mark `type`.
-      return state
-        .transform()
-        .toggleMark(type)
-        .apply()
-    }
-  }
-}
+// function MarkHotkey(options) {
+//   const { type, tone } = options
+//
+//   // Return our "plugin" object, containing the `onKeyDown` handler.
+//   return {
+//     onKeyDown(event, data, state) {
+//       // Toggle the mark `type`.
+//       return state
+//         .transform()
+//         .toggleMark(type)
+//         .apply()
+//     }
+//   }
+// }
 
 console.log("here");
 ReactDOM.render(

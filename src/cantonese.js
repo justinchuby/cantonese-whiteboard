@@ -19,3 +19,12 @@ class Jyutping {
     this.tone = tone;
   }
 }
+
+class NotedChar {
+  constructor(char) {
+    this.content = "我";
+    this.jyutping = new Jyutping("ngo5");
+  }
+}
+
+export { Jyutping, NotedChar };
