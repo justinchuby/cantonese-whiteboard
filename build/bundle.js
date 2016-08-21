@@ -93,12 +93,11 @@
 	 * @param {Block} block
 	 */
 
-	function codeBlockDecorator(text, block) {
+	function paragraphBlockDecorator(text, block) {
 	  var characters = text.characters.asMutable();
 	  var string = text.text;
 	  for (var i = 0; i < string.length; i++) {
 	    var char = characters.get(i);
-	    console.log(char);
 	    var _char = char;
 	    var marks = _char.marks;
 
@@ -107,14 +106,9 @@
 	    var type = 'tone_' + notedChar.jyutping.tone;
 	    console.log(type);
 	    marks = marks.add(_slate.Mark.create({ type: type }));
-	    console.log(marks);
 	    char = char.merge({ marks: marks });
 	    characters = characters.set(i, char);
 	  }
-
-	  //   offset = length
-	  // }
-
 	  return characters.asImmutable();
 	}
 
@@ -144,7 +138,7 @@
 	                props.children
 	              );
 	            },
-	            decorate: codeBlockDecorator
+	            decorate: paragraphBlockDecorator
 	          }
 	        },
 	        marks: {
@@ -230,7 +224,6 @@
 
 	;
 
-	console.log("here");
 	_reactDom2.default.render(_react2.default.createElement(App, null), document.getElementById('test1'));
 
 /***/ },

@@ -3,7 +3,9 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { Editor, Raw, Mark } from 'slate'
 import { Jyutping, NotedChar } from './cantonese'
+import CANTO_DICT from './cantonese-dictionary'
 
+cantoDict = new CantoDict(CANTO_DICT)
 
 const initialState = Raw.deserialize({
   nodes: [
@@ -27,26 +29,20 @@ const initialState = Raw.deserialize({
  * @param {Block} block
  */
 
-function codeBlockDecorator(text, block) {
+function paragraphBlockDecorator(text, block) {
   let characters = text.characters.asMutable()
   const string = text.text
   for (let i = 0; i < string.length; i++) {
     let char = characters.get(i)
-    console.log(char)
     let { marks } = char
     let notedChar = new NotedChar(string[i])
-    // note the type of char.
     let type = `tone_${notedChar.jyutping.tone}`
+
     console.log(type)
     marks = marks.add(Mark.create({ type }))
-    console.log(marks)
     char = char.merge({ marks })
     characters = characters.set(i, char)
   }
-
-  //   offset = length
-  // }
-
   return characters.asImmutable()
 }
 
@@ -59,7 +55,7 @@ class App extends React.Component {
       nodes: {
         paragraph: {
           render: props => <div className="board">{props.children}</div>,
-          decorate: codeBlockDecorator
+          decorate: paragraphBlockDecorator
         }
       },
       marks: {
@@ -103,7 +99,6 @@ class App extends React.Component {
 
 };
 
-console.log("here");
 ReactDOM.render(
         <App />,
         document.getElementById('test1')
