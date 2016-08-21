@@ -95,30 +95,19 @@
 
 	function codeBlockDecorator(text, block) {
 	  var characters = text.characters.asMutable();
-	  // const language = block.data.get('language')
 	  var string = text.text;
-	  // const grammar = Prism.languages[language]
-	  // const tokens = Prism.tokenize(string, grammar)
-	  // const tokens = Canto.tokenize(string)
-	  // let offset = 0
-
-	  // for (const token of tokens) {
-	  //   if (typeof token == 'string') {
-	  //     offset += token.length
-	  //     continue
-	  //   }
-	  //
-	  //   const length = offset + token.content.length
-	  //   const type = `${token.type}`
-
-	  for (var i = 0; i < characters.length; i++) {
+	  for (var i = 0; i < string.length; i++) {
 	    var char = characters.get(i);
+	    console.log(char);
 	    var _char = char;
 	    var marks = _char.marks;
 
-	    var notedChar = (0, _cantonese.NotedChar)(char);
-	    var type = 'tone-' + notedChar.jyutping.tone;
+	    var notedChar = new _cantonese.NotedChar(string[i]);
+	    // note the type of char.
+	    var type = 'tone_' + notedChar.jyutping.tone;
+	    console.log(type);
 	    marks = marks.add(_slate.Mark.create({ type: type }));
+	    console.log(marks);
 	    char = char.merge({ marks: marks });
 	    characters = characters.set(i, char);
 	  }
@@ -203,6 +192,8 @@
 	          }
 	        }
 	      }
+	    }, _this.onChange = function (state) {
+	      _this.setState({ state: state });
 	    }, _temp), _possibleConstructorReturn(_this, _ret);
 	  }
 
@@ -226,9 +217,7 @@
 	      return _react2.default.createElement(_slate.Editor, {
 	        schema: this.state.schema,
 	        state: this.state.state,
-	        onChange: function onChange(state) {
-	          return _this2.setState({ state: state });
-	        },
+	        onChange: this.onChange,
 	        onKeyDown: function onKeyDown(e, data, state) {
 	          return _this2.onKeyDown(e, data, state);
 	        }

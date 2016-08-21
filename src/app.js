@@ -1,8 +1,8 @@
 
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { Editor, Raw, Mark } from 'slate';
-import { Jyutping, NotedChar } from './cantonese';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import { Editor, Raw, Mark } from 'slate'
+import { Jyutping, NotedChar } from './cantonese'
 
 
 const initialState = Raw.deserialize({
@@ -29,28 +29,17 @@ const initialState = Raw.deserialize({
 
 function codeBlockDecorator(text, block) {
   let characters = text.characters.asMutable()
-  // const language = block.data.get('language')
   const string = text.text
-  // const grammar = Prism.languages[language]
-  // const tokens = Prism.tokenize(string, grammar)
-  // const tokens = Canto.tokenize(string)
-  // let offset = 0
-
-  // for (const token of tokens) {
-  //   if (typeof token == 'string') {
-  //     offset += token.length
-  //     continue
-  //   }
-  //
-  //   const length = offset + token.content.length
-  //   const type = `${token.type}`
-
-  for (let i = 0; i < characters.length; i++) {
+  for (let i = 0; i < string.length; i++) {
     let char = characters.get(i)
+    console.log(char)
     let { marks } = char
-    let notedChar = NotedChar(char)
-    let type = `tone-${notedChar.jyutping.tone}`
+    let notedChar = new NotedChar(string[i])
+    // note the type of char.
+    let type = `tone_${notedChar.jyutping.tone}`
+    console.log(type)
     marks = marks.add(Mark.create({ type }))
+    console.log(marks)
     char = char.merge({ marks })
     characters = characters.set(i, char)
   }
@@ -84,6 +73,10 @@ class App extends React.Component {
     }
   }
 
+  onChange = (state) => {
+    this.setState({ state })
+  }
+
   onKeyDown(event, data, state) {
     if (!event.metaKey) return
 
@@ -102,7 +95,7 @@ class App extends React.Component {
       <Editor
         schema={this.state.schema}
         state={this.state.state}
-        onChange={state => this.setState({ state })}
+        onChange={this.onChange}
         onKeyDown={(e, data, state) => this.onKeyDown(e, data, state)}
       />
     )
