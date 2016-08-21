@@ -23,7 +23,7 @@ class Jyutping {
 class NotedChar {
   constructor(char) {
     this.content = "我";
-    this.jyutping = new Jyutping("ngo5");
+    this.jyutping = new Jyutping("ngo1");
   }
 }
 

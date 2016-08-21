@@ -86,17 +86,6 @@
 	  }]
 	}, { terse: true });
 
-	// Initialize a plugin for each mark...
-	// const plugins = [
-	//   MarkHotkey({ tone: 1, type: 'tone_1' }),
-	//   MarkHotkey({ tone: 2, type: 'tone_2' }),
-	//   MarkHotkey({ tone: 3, type: 'tone_3' }),
-	//   MarkHotkey({ tone: 4, type: 'tone_4' }),
-	//   MarkHotkey({ tone: 5, type: 'tone_5' }),
-	//   MarkHotkey({ tone: 6, type: 'tone_6' })
-	// ]
-
-
 	/**
 	 * Define a decorator for blocks.
 	 *
@@ -173,7 +162,7 @@
 	          tone_1: function tone_1(props) {
 	            return _react2.default.createElement(
 	              'span',
-	              { style: 'color:red;' },
+	              { className: 'tone-1' },
 	              props.children
 	            );
 	          },
@@ -218,6 +207,18 @@
 	  }
 
 	  _createClass(App, [{
+	    key: 'onKeyDown',
+	    value: function onKeyDown(event, data, state) {
+	      if (!event.metaKey) return;
+
+	      switch (event.which) {
+	        case 66:
+	          {
+	            return state.transform().toggleMark('tone_1').apply();
+	          }
+	      }
+	    }
+	  }, {
 	    key: 'render',
 	    value: function render() {
 	      var _this2 = this;
@@ -227,6 +228,9 @@
 	        state: this.state.state,
 	        onChange: function onChange(state) {
 	          return _this2.setState({ state: state });
+	        },
+	        onKeyDown: function onKeyDown(e, data, state) {
+	          return _this2.onKeyDown(e, data, state);
 	        }
 	      });
 	    }
@@ -236,21 +240,6 @@
 	}(_react2.default.Component);
 
 	;
-
-	// function MarkHotkey(options) {
-	//   const { type, tone } = options
-	//
-	//   // Return our "plugin" object, containing the `onKeyDown` handler.
-	//   return {
-	//     onKeyDown(event, data, state) {
-	//       // Toggle the mark `type`.
-	//       return state
-	//         .transform()
-	//         .toggleMark(type)
-	//         .apply()
-	//     }
-	//   }
-	// }
 
 	console.log("here");
 	_reactDom2.default.render(_react2.default.createElement(App, null), document.getElementById('test1'));
@@ -77461,7 +77450,7 @@
 	  _classCallCheck(this, NotedChar);
 
 	  this.content = "我";
-	  this.jyutping = new Jyutping("ngo5");
+	  this.jyutping = new Jyutping("ngo1");
 	};
 
 	exports.Jyutping = Jyutping;

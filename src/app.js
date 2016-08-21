@@ -20,17 +20,6 @@ const initialState = Raw.deserialize({
   ]
 }, { terse: true })
 
-// Initialize a plugin for each mark...
-// const plugins = [
-//   MarkHotkey({ tone: 1, type: 'tone_1' }),
-//   MarkHotkey({ tone: 2, type: 'tone_2' }),
-//   MarkHotkey({ tone: 3, type: 'tone_3' }),
-//   MarkHotkey({ tone: 4, type: 'tone_4' }),
-//   MarkHotkey({ tone: 5, type: 'tone_5' }),
-//   MarkHotkey({ tone: 6, type: 'tone_6' })
-// ]
-
-
 /**
  * Define a decorator for blocks.
  *
@@ -72,6 +61,7 @@ function codeBlockDecorator(text, block) {
   return characters.asImmutable()
 }
 
+
 class App extends React.Component {
 
   state = {
@@ -84,12 +74,25 @@ class App extends React.Component {
         }
       },
       marks: {
-        tone_1: props => <span style="color:red;">{props.children}</span>,
+        tone_1: props => <span className="tone-1">{props.children}</span>,
         tone_2: props => <span className="tone-2">{props.children}</span>,
         tone_3: props => <span className="tone-3">{props.children}</span>,
         tone_4: props => <span className="tone-4">{props.children}</span>,
         tone_5: props => <span className="tone-5">{props.children}</span>,
         tone_6: props => <span className="tone-6">{props.children}</span>,
+      }
+    }
+  }
+
+  onKeyDown(event, data, state) {
+    if (!event.metaKey) return
+
+    switch (event.which) {
+      case 66: {
+        return state
+          .transform()
+          .toggleMark('tone_1')
+          .apply()
       }
     }
   }
@@ -100,27 +103,12 @@ class App extends React.Component {
         schema={this.state.schema}
         state={this.state.state}
         onChange={state => this.setState({ state })}
+        onKeyDown={(e, data, state) => this.onKeyDown(e, data, state)}
       />
     )
   }
 
 };
-
-
-// function MarkHotkey(options) {
-//   const { type, tone } = options
-//
-//   // Return our "plugin" object, containing the `onKeyDown` handler.
-//   return {
-//     onKeyDown(event, data, state) {
-//       // Toggle the mark `type`.
-//       return state
-//         .transform()
-//         .toggleMark(type)
-//         .apply()
-//     }
-//   }
-// }
 
 console.log("here");
 ReactDOM.render(
