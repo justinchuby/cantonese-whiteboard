@@ -4,7 +4,6 @@ import { Editor, Raw, Mark } from 'slate';
 import { CantoDict, Jyutping, NotedChar } from './cantonese';
 import * as cantonese_dictionary from './cantonese-dictionary';
 
-console.log(Jyutping, NotedChar, CantoDict)
 let cantoDict = new CantoDict(cantonese_dictionary.CANTO_DICT)
 
 const initialState = Raw.deserialize({
@@ -35,10 +34,12 @@ function paragraphBlockDecorator(text, block) {
   for (let i = 0; i < string.length; i++) {
     let char = characters.get(i)
     let { marks } = char
-    let notedChar = cantoDict.getNotedChar(string[i])
+    let in_str = string.slice(i-1, i+3) || ""
+    // console.log(string[i], in_str)
+    let notedChar = cantoDict.getNotedChar(string[i], in_str)
+    // console.log(notedChar)
     if (notedChar) {
       let type = `tone_${notedChar.jyutping.tone}`
-      console.log(type)
       marks = marks.add(Mark.create({ type }))
       char = char.merge({ marks })
       characters = characters.set(i, char)

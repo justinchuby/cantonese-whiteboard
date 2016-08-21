@@ -63,6 +63,7 @@ class CantoDict {
   getNotedChar(char, in_str="") {
     let zi = this.lookupZi(char)
     if (zi) {
+      // console.log(in_str)
       return zi.chooseOne(in_str)
     }
     return null
@@ -98,6 +99,7 @@ class Zi {
           if (use_case.includes("(")) {
             use_case = use_case.slice(0, use_case.indexOf("("))
           }
+          // console.log(use_case)
           if (in_str.includes(use_case)) {
             return notedChar
           }
@@ -115,6 +117,7 @@ class Zi {
       if (notedChar.is_proper) {
         currentWeight *= 0.6
       }
+      console.log(currentWeight, notedChar)
       if (currentWeight > maxWeight) {
         maxWeight = currentWeight
         maxWeightChar = notedChar
@@ -171,6 +174,8 @@ function parse_line(line) {
         }
       }
     }
+    notedChar.explanations = explanations
+    notedChar.use_cases = use_cases
     return notedChar
   }
   return null
