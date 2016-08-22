@@ -113,7 +113,6 @@
 	      marks = marks.add(_slate.Mark.create({ type: "pinyin", data: { notedChar: notedChar } }));
 	      char = char.merge({ marks: marks });
 	      characters = characters.set(i, char);
-	      // console.log(marks)
 	    }
 	  }
 	  return characters.asImmutable();
