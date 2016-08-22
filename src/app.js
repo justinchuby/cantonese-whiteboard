@@ -14,7 +14,7 @@ const initialState = Raw.deserialize({
       nodes: [
         {
           kind: 'text',
-          text: '粤语黑板'
+          text: '粤语注音白板'
         }
       ]
     }
@@ -107,5 +107,5 @@ class App extends React.Component {
 
 ReactDOM.render(
         <App />,
-        document.getElementById('test1')
+        document.getElementById('app')
 );

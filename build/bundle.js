@@ -89,7 +89,7 @@
 	    type: 'paragraph',
 	    nodes: [{
 	      kind: 'text',
-	      text: '粤语黑板'
+	      text: '粤语注音白板'
 	    }]
 	  }]
 	}, { terse: true });
@@ -252,7 +252,7 @@
 
 	;
 
-	_reactDom2.default.render(_react2.default.createElement(App, null), document.getElementById('test1'));
+	_reactDom2.default.render(_react2.default.createElement(App, null), document.getElementById('app'));
 
 /***/ },
 /* 2 */
