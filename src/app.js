@@ -40,9 +40,11 @@ function paragraphBlockDecorator(text, block) {
     // console.log(notedChar)
     if (notedChar) {
       let type = `tone_${notedChar.jyutping.tone}`
-      marks = marks.add(Mark.create({ type }))
+      marks = marks.add(Mark.create({ type: "pinyin", data: {notedChar: notedChar} }))
+      marks = marks.add(Mark.create({ type: type }))
       char = char.merge({ marks })
       characters = characters.set(i, char)
+      // console.log(marks)
     }
   }
   return characters.asImmutable()
@@ -61,12 +63,14 @@ class App extends React.Component {
         }
       },
       marks: {
+        // props.mark.data.get("notedChar").jyutping.pinyin
         tone_1: props => <span className="tone-1">{props.children}</span>,
         tone_2: props => <span className="tone-2">{props.children}</span>,
         tone_3: props => <span className="tone-3">{props.children}</span>,
         tone_4: props => <span className="tone-4">{props.children}</span>,
         tone_5: props => <span className="tone-5">{props.children}</span>,
         tone_6: props => <span className="tone-6">{props.children}</span>,
+        pinyin: props => <ruby {...props.attributes}>{props.children}<rt>{props.mark.data.get("notedChar").jyutping.pinyin}</rt></ruby>
       }
     }
   }
