@@ -20,7 +20,12 @@ function paragraphBlockDecorator(text, block) {
   for (let i = 0; i < string.length; i++) {
     let char = characters.get(i)
     let { marks } = char
-    let in_str = string.slice(i-1, i+3) || ""
+    let in_str = ""
+    if (string.length <= 4) {
+      in_str = string
+    } else {
+      in_str = string.slice((i-2 >= 0) ? i-2 : 0, i+3) || ""
+    }
     // console.log(string[i], in_str)
     let notedChar = cantoDict.getNotedChar(string[i], in_str)
     // console.log(notedChar)
