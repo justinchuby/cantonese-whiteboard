@@ -253,13 +253,49 @@
 	  }
 
 	  _createClass(App, [{
+	    key: 'onDocumentChange',
+	    value: function onDocumentChange(document, state) {
+	      var string = JSON.stringify(_slate.Raw.serialize(state, { terse: true }));
+	      console.log(string);
+	      var encodedContent = encodeURIComponent(string);
+	      window.location.hash = "#" + encodedContent;
+	    }
+	  }, {
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
+	      window.addEventListener('hashchange', this.onHashChange(this));
+	    }
+	  }, {
+	    key: 'onHashChange',
+	    value: function onHashChange(parent) {
+	      var hashContent = decodeURIComponent(location.hash.slice(1));
+	      if (hashContent) {
+	        try {
+	          var stateObj = JSON.parse(hashContent);
+	          var hashState = _slate.Raw.deserialize(stateObj, { terse: true });
+	          parent.onChange(hashState);
+	        } catch (err) {
+	          console.warn(err);
+	          var _hashState = _slate.Plain.deserialize(hashContent);
+	          _hashState = _hashState.transform().setBlock('paragraph').apply();
+	          parent.onChange(_hashState);
+	        }
+	      }
+	    }
+	  }, {
 	    key: 'render',
 	    value: function render() {
+	      var _this2 = this;
+
 	      return _react2.default.createElement(_slate.Editor, {
 	        schema: this.state.schema,
 	        state: this.state.state,
 	        plugins: plugins,
-	        onChange: this.onChange
+	        onChange: this.onChange,
+	        onDocumentChange: function onDocumentChange(document, state) {
+	          return _this2.onDocumentChange(document, state);
+	        },
+	        componentDidMount: this.componentDidMount
 	      });
 	    }
 	  }]);

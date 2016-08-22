@@ -2,7 +2,8 @@
   "scripts": {
     "webpack": "webpack --watch",
     "babel": "babel src --out-dir build -w",
-    "server": "browser-sync --port 4000 start --server --files \"**/*.html\" \"build/**/*.css\" \"build/**/*.js\" "
+    "server": "browser-sync --port 4000 start --server --files \"**/*.html\" \"build/**/*.css\" \"build/**/*.js\" ",
+    "minifyjs": "uglifyjs --compress --mangle --output build/bundle.min.js -- build/bundle.js"
   },
   "babel": {
     "presets": [

@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { Editor, Raw, Mark } from 'slate'
+import { Editor, Raw, Mark, Plain } from 'slate'
 import { CantoDict, Jyutping, NotedChar } from './cantonese'
 import * as cantonese_dictionary from './cantonese-dictionary'
 import initialState from './state.json'
@@ -92,6 +92,36 @@ class App extends React.Component {
     this.setState({ state })
   }
 
+  onDocumentChange(document, state) {
+    const string = JSON.stringify(Raw.serialize(state, { terse: true }))
+    console.log(string)
+    const encodedContent = encodeURIComponent(string)
+    window.location.hash = "#" + encodedContent
+  }
+
+  componentDidMount() {
+    window.addEventListener('hashchange', this.onHashChange(this));
+  }
+
+  onHashChange(parent) {
+    const hashContent = decodeURIComponent(location.hash.slice(1))
+    if (hashContent) {
+      try {
+        const stateObj = JSON.parse(hashContent);
+        const hashState = Raw.deserialize(stateObj, { terse: true })
+        parent.onChange(hashState)
+      } catch (err) {
+        console.warn(err)
+        let hashState = Plain.deserialize(hashContent)
+        hashState = hashState
+          .transform()
+          .setBlock('paragraph')
+          .apply()
+        parent.onChange(hashState)
+      }
+    }
+  }
+
   render() {
     return (
       <Editor
@@ -99,6 +129,8 @@ class App extends React.Component {
         state={this.state.state}
         plugins={plugins}
         onChange={this.onChange}
+        onDocumentChange={(document, state) => this.onDocumentChange(document, state)}
+        componentDidMount={this.componentDidMount}
       />
     )
   }
