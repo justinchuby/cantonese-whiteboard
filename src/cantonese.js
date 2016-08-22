@@ -92,6 +92,7 @@ class Zi {
     let maxWeightChar = null
     for (let key in this.pronunciations) {
       let notedChar = this.pronunciations[key]
+      console.log(in_str, notedChar)
       let currentWeight = 1
       if (notedChar.use_cases) {
         currentWeight += notedChar.use_cases.length
@@ -117,7 +118,7 @@ class Zi {
       if (notedChar.is_proper) {
         currentWeight *= 0.6
       }
-      console.log(currentWeight, notedChar)
+      console.log("⬆️",currentWeight)
       if (currentWeight > maxWeight) {
         maxWeight = currentWeight
         maxWeightChar = notedChar
