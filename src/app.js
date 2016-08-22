@@ -31,7 +31,6 @@ function paragraphBlockDecorator(text, block) {
       marks = marks.add(Mark.create({ type: "pinyin", data: {notedChar: notedChar} }))
       char = char.merge({ marks })
       characters = characters.set(i, char)
-      // console.log(marks)
     }
   }
   return characters.asImmutable()
@@ -134,7 +133,6 @@ class App extends React.Component {
       />
     )
   }
-
 };
 
 ReactDOM.render(
