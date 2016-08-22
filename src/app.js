@@ -14,7 +14,7 @@ const initialState = Raw.deserialize({
       nodes: [
         {
           kind: 'text',
-          text: '一个字 A line of text in a paragraph.'
+          text: '粤语黑板'
         }
       ]
     }
@@ -40,8 +40,9 @@ function paragraphBlockDecorator(text, block) {
     // console.log(notedChar)
     if (notedChar) {
       let type = `tone_${notedChar.jyutping.tone}`
-      marks = marks.add(Mark.create({ type: "pinyin", data: {notedChar: notedChar} }))
+      // The order of adding marks affects the color of ruby.
       marks = marks.add(Mark.create({ type: type }))
+      marks = marks.add(Mark.create({ type: "pinyin", data: {notedChar: notedChar} }))
       char = char.merge({ marks })
       characters = characters.set(i, char)
       // console.log(marks)
@@ -50,9 +51,7 @@ function paragraphBlockDecorator(text, block) {
   return characters.asImmutable()
 }
 
-
 class App extends React.Component {
-
   state = {
     state: initialState,
     schema: {
@@ -70,7 +69,8 @@ class App extends React.Component {
         tone_4: props => <span className="tone-4">{props.children}</span>,
         tone_5: props => <span className="tone-5">{props.children}</span>,
         tone_6: props => <span className="tone-6">{props.children}</span>,
-        pinyin: props => <ruby {...props.attributes}>{props.children}<rt>{props.mark.data.get("notedChar").jyutping.pinyin}</rt></ruby>
+        pinyin: props => <ruby>{props.children}<rt>{props.mark.data.get("notedChar").jyutping.pinyin}</rt></ruby>
+        // pinyin: props => <div className="popup" title={props.mark.data.get("notedChar").jyutping.pinyin}>{props.children}</div>
       }
     }
   }

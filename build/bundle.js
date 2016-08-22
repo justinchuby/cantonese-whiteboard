@@ -89,7 +89,7 @@
 	    type: 'paragraph',
 	    nodes: [{
 	      kind: 'text',
-	      text: '一个字 A line of text in a paragraph.'
+	      text: '粤语黑板'
 	    }]
 	  }]
 	}, { terse: true });
@@ -115,8 +115,9 @@
 	    // console.log(notedChar)
 	    if (notedChar) {
 	      var type = 'tone_' + notedChar.jyutping.tone;
-	      marks = marks.add(_slate.Mark.create({ type: "pinyin", data: { notedChar: notedChar } }));
+	      // The order of adding marks affects the color of ruby.
 	      marks = marks.add(_slate.Mark.create({ type: type }));
+	      marks = marks.add(_slate.Mark.create({ type: "pinyin", data: { notedChar: notedChar } }));
 	      char = char.merge({ marks: marks });
 	      characters = characters.set(i, char);
 	      // console.log(marks)
@@ -201,7 +202,7 @@
 	          pinyin: function pinyin(props) {
 	            return _react2.default.createElement(
 	              'ruby',
-	              props.attributes,
+	              null,
 	              props.children,
 	              _react2.default.createElement(
 	                'rt',
@@ -210,6 +211,7 @@
 	              )
 	            );
 	          }
+	          // pinyin: props => <div className="popup" title={props.mark.data.get("notedChar").jyutping.pinyin}>{props.children}</div>
 	        }
 	      }
 	    }, _this.onChange = function (state) {
