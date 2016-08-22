@@ -2,7 +2,7 @@
   "scripts": {
     "webpack": "webpack --watch",
     "babel": "babel src --out-dir build -w",
-    "server": "browser-sync --port 4000 start --server --files \"**/*.html\" \"build/**/*.css\" \"build/**/*.js\" ",
+    "server": "browser-sync --port 4000 start --server --files \"**/*.html\" \"build/**/*.css\" \"build/**/*.js\" \"**/*.json\"",
     "minifyjs": "uglifyjs --compress --mangle --output build/bundle.min.js -- build/bundle.js"
   },
   "babel": {
@@ -29,6 +29,7 @@
   "dependencies": {
     "json-loader": "^0.5.4",
     "react": "^15.3.1",
-    "react-dom": "^15.3.1"
+    "react-dom": "^15.3.1",
+    "whatwg-fetch": "^1.0.0"
   }
 }

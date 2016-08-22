@@ -40,9 +40,8 @@ class NotedChar {
 }
 
 class CantoDict {
-  constructor(f) {
+  constructor(lines) {
     this.dict = {}
-    let lines = f.split("\n")
     for (let line of lines) {
       let notedChar = parse_line(line)
       if (notedChar) {

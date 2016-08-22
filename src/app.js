@@ -2,10 +2,11 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { Editor, Raw, Mark, Plain } from 'slate'
 import { CantoDict, Jyutping, NotedChar } from './cantonese'
-import * as cantonese_dictionary from './cantonese-dictionary'
+// import * as cantonese_dictionary from './cantonese-dictionary'
+import 'whatwg-fetch'
 import initialState from './state.json'
 
-const cantoDict = new CantoDict(cantonese_dictionary.CANTO_DICT)
+let cantoDict = new CantoDict("")
 
 /**
  * Define a decorator for blocks.
@@ -98,13 +99,24 @@ class App extends React.Component {
 
   onDocumentChange(document, state) {
     const string = JSON.stringify(Raw.serialize(state, { terse: true }))
-    console.log(string)
+    // console.log(string)
     const encodedContent = encodeURIComponent(string)
     window.location.hash = "#" + encodedContent
   }
 
   componentDidMount() {
     window.addEventListener('hashchange', this.onHashChange(this));
+    let fetched = false
+    // var self = this
+    // Load dictionary
+    fetch('./data/cantonese-dictionary.json')
+      .then(function(response) {
+        return response.json()
+      }).then(function(json) {
+        cantoDict = new CantoDict(json.dictionary)
+      }).catch(function(ex) {
+        console.warn('parsing failed', ex)
+      })
   }
 
   onHashChange(parent) {
