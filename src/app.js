@@ -1,25 +1,11 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { Editor, Raw, Mark } from 'slate';
-import { CantoDict, Jyutping, NotedChar } from './cantonese';
-import * as cantonese_dictionary from './cantonese-dictionary';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import { Editor, Raw, Mark } from 'slate'
+import { CantoDict, Jyutping, NotedChar } from './cantonese'
+import * as cantonese_dictionary from './cantonese-dictionary'
+import initialState from './state.json'
 
-let cantoDict = new CantoDict(cantonese_dictionary.CANTO_DICT)
-
-const initialState = Raw.deserialize({
-  nodes: [
-    {
-      kind: 'block',
-      type: 'paragraph',
-      nodes: [
-        {
-          kind: 'text',
-          text: '粤语注音白板'
-        }
-      ]
-    }
-  ]
-}, { terse: true })
+const cantoDict = new CantoDict(cantonese_dictionary.CANTO_DICT)
 
 /**
  * Define a decorator for blocks.
@@ -51,9 +37,32 @@ function paragraphBlockDecorator(text, block) {
   return characters.asImmutable()
 }
 
+function MarkHotkey(options) {
+  const { type, code } = options
+  // Return our "plugin" object, containing the `onKeyDown` handler.
+  return {
+    onKeyDown(event, data, state) {
+      // Check that the key pressed matches our `code` option.
+      if (!event.metaKey || event.which != code) return
+      // Toggle the mark `type`.
+      return state
+        .transform()
+        .toggleMark(type)
+        .apply()
+    }
+  }
+}
+
+const plugins = [
+  MarkHotkey({ code: 66, type: 'bold' }),
+  MarkHotkey({ code: 73, type: 'italic' }),
+  // MarkHotkey({ code: 68, type: 'strikethrough' }),
+  MarkHotkey({ code: 85, type: 'underline' })
+]
+
 class App extends React.Component {
   state = {
-    state: initialState,
+    state: Raw.deserialize(initialState, { terse: true }),
     schema: {
       nodes: {
         paragraph: {
@@ -69,7 +78,11 @@ class App extends React.Component {
         tone_4: props => <span className="tone-4">{props.children}</span>,
         tone_5: props => <span className="tone-5">{props.children}</span>,
         tone_6: props => <span className="tone-6">{props.children}</span>,
-        pinyin: props => <ruby>{props.children}<rt>{props.mark.data.get("notedChar").jyutping.pinyin}</rt></ruby>
+        pinyin: props => <ruby>{props.children}<rt>{props.mark.data.get("notedChar").jyutping.pinyin}</rt></ruby>,
+        bold: props => <strong>{props.children}</strong>,
+        italic: props => <em>{props.children}</em>,
+        // strikethrough: props => <del>{props.children}</del>,
+        underline: props => <u>{props.children}</u>,
         // pinyin: props => <div className="popup" title={props.mark.data.get("notedChar").jyutping.pinyin}>{props.children}</div>
       }
     }
@@ -79,26 +92,13 @@ class App extends React.Component {
     this.setState({ state })
   }
 
-  onKeyDown(event, data, state) {
-    if (!event.metaKey) return
-
-    switch (event.which) {
-      case 66: {
-        return state
-          .transform()
-          .toggleMark('tone_1')
-          .apply()
-      }
-    }
-  }
-
   render() {
     return (
       <Editor
         schema={this.state.schema}
         state={this.state.state}
+        plugins={plugins}
         onChange={this.onChange}
-        onKeyDown={(e, data, state) => this.onKeyDown(e, data, state)}
       />
     )
   }
