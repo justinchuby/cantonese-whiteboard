@@ -81,8 +81,6 @@
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	// import * as cantonese_dictionary from './cantonese-dictionary'
-
 
 	var cantoDict = new _cantonese.CantoDict("");
 
@@ -140,7 +138,6 @@
 	function BlockHotkey(options) {
 	  var type = options.type;
 	  var code = options.code;
-	  // Return our "plugin" object, containing the `onKeyDown` handler.
 
 	  var typeTransition = {
 	    "line": "colored_jyutping_paragraph",
