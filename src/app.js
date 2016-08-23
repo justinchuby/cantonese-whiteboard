@@ -32,13 +32,9 @@ function paragraphBlockDecorator(text, block) {
     // console.log(notedChar)
     if (notedChar) {
       // The order of adding marks affects the color of ruby.
-      if (block.type == "colored_paragraph" || "colored_jyutping_paragraph") {
-        let type = `tone_${notedChar.jyutping.tone}`
-        marks = marks.add(Mark.create({ type: type }))
-      }
-      if (block.type == "jyutping_paragraph" || "colored_jyutping_paragraph") {
-        marks = marks.add(Mark.create({ type: "pinyin", data: {notedChar: notedChar} }))
-      }
+      let type = `tone_${notedChar.jyutping.tone}`
+      marks = marks.add(Mark.create({ type: type }))
+      marks = marks.add(Mark.create({ type: "pinyin", data: {notedChar: notedChar} }))
       char = char.merge({ marks })
       characters = characters.set(i, char)
     }
@@ -65,18 +61,28 @@ function MarkHotkey(options) {
 function BlockHotkey(options) {
   const { type, code } = options
   // Return our "plugin" object, containing the `onKeyDown` handler.
+  const typeTransition = {
+    "line": "colored_jyutping_paragraph",
+    "colored_jyutping_paragraph": "colored_paragraph",
+    "colored_paragraph": "line"
+  }
   return {
     onKeyDown(event, data, state) {
       // Check that the key pressed matches our `code` option.
-      if (!event.metaKey || event.which != code) return
-      // Toggle the mark `type`.
-      // if (code == 75) {
-      //   state = state
-      //     .transform()
-      //     .removeMark('pinyin')
-      //     .apply()
-      // }
-      // TODO: Could first change it to line type then set it to the desire type
+      if (event.which != code) return
+      if (!event.metaKey) {
+        if (type == "") {
+          event.preventDefault()
+          let currentType = state.blocks.get(0).type
+          let nextType = typeTransition[currentType]
+          return state
+            .transform()
+            .setBlock(nextType)
+            .apply()
+        } else {
+          return
+        }
+      }
       return state
         .transform()
         .setBlock(type)
@@ -86,12 +92,13 @@ function BlockHotkey(options) {
 }
 
 const plugins = [
-  MarkHotkey({ code: 66, type: 'bold' }),
-  MarkHotkey({ code: 73, type: 'italic' }),
+  MarkHotkey({ code: 66, type: 'bold' }), // Key B
+  MarkHotkey({ code: 73, type: 'italic' }), // Key I
   // MarkHotkey({ code: 68, type: 'strikethrough' }),
-  MarkHotkey({ code: 85, type: 'underline' }),
-  BlockHotkey({ code: 74, type: 'colored_jyutping_paragraph' }),
-  BlockHotkey({ code: 75, type: 'colored_paragraph' }),
+  MarkHotkey({ code: 85, type: 'underline' }), // Key U
+  BlockHotkey({ code: 74, type: 'colored_jyutping_paragraph' }), // Key J
+  BlockHotkey({ code: 75, type: 'colored_paragraph' }), // Key K
+  BlockHotkey({ code: 9, type: '' }), // Key Tab
 ]
 
 class App extends React.Component {
@@ -107,8 +114,11 @@ class App extends React.Component {
           decorate: paragraphBlockDecorator
         },
         colored_paragraph: {
-          render: props => <div className="board colored">{props.children}</div>,
+          render: props => <div className="board colored no-jyutping">{props.children}</div>,
           decorate: paragraphBlockDecorator
+        },
+        wrapper: {
+          render: props => <div>{props.children}</div>,
         },
         // jyutping_paragraph: {
         //   render: props => <div className="board jyutping">{props.children}</div>,
@@ -157,27 +167,30 @@ class App extends React.Component {
       }).then(function(json) {
         cantoDict = new CantoDict(json.dictionary)
       }).then(function() {
-        let next = self.state.state
-          .transform()
-          .setBlock('line')
-          .apply()
-        self.onChange(next)
-        next = self.state.state
-          .transform()
-          .setBlock('colored_jyutping_paragraph')
-          .apply()
-        self.onChange(next)
-        console.log(next)
+        self.refreshDocument(self)
       })
   }
 
-  onHashChange(parent) {
+  refreshDocument(self) {
+    let next = self.state.state
+      .transform()
+      .wrapBlock('wrapper')
+      .apply()
+    self.onChange(next)
+    next = self.state.state
+      .transform()
+      .unwrapBlock('wrapper')
+      .apply()
+    self.onChange(next)
+  }
+
+  onHashChange(self) {
     const hashContent = decodeURIComponent(location.hash.slice(1))
     if (hashContent) {
       try {
         const stateObj = JSON.parse(hashContent);
         const hashState = Raw.deserialize(stateObj, { terse: true })
-        parent.onChange(hashState)
+        self.onChange(hashState)
       } catch (err) {
         console.warn(err)
         let hashState = Plain.deserialize(hashContent)
@@ -185,7 +198,7 @@ class App extends React.Component {
           .transform()
           .setBlock('paragraph')
           .apply()
-        parent.onChange(hashState)
+        self.onChange(hashState)
       }
     }
   }

@@ -44,7 +44,8 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(1);
+	__webpack_require__(1);
+	module.exports = __webpack_require__(405);
 
 
 /***/ },
@@ -111,13 +112,9 @@
 	    // console.log(notedChar)
 	    if (notedChar) {
 	      // The order of adding marks affects the color of ruby.
-	      if (block.type == "colored_paragraph" || "colored_jyutping_paragraph") {
-	        var type = 'tone_' + notedChar.jyutping.tone;
-	        marks = marks.add(_slate.Mark.create({ type: type }));
-	      }
-	      if (block.type == "jyutping_paragraph" || "colored_jyutping_paragraph") {
-	        marks = marks.add(_slate.Mark.create({ type: "pinyin", data: { notedChar: notedChar } }));
-	      }
+	      var type = 'tone_' + notedChar.jyutping.tone;
+	      marks = marks.add(_slate.Mark.create({ type: type }));
+	      marks = marks.add(_slate.Mark.create({ type: "pinyin", data: { notedChar: notedChar } }));
 	      char = char.merge({ marks: marks });
 	      characters = characters.set(i, char);
 	    }
@@ -145,25 +142,37 @@
 	  var code = options.code;
 	  // Return our "plugin" object, containing the `onKeyDown` handler.
 
+	  var typeTransition = {
+	    "line": "colored_jyutping_paragraph",
+	    "colored_jyutping_paragraph": "colored_paragraph",
+	    "colored_paragraph": "line"
+	  };
 	  return {
 	    onKeyDown: function onKeyDown(event, data, state) {
 	      // Check that the key pressed matches our `code` option.
-	      if (!event.metaKey || event.which != code) return;
-	      // Toggle the mark `type`.
-	      // if (code == 75) {
-	      //   state = state
-	      //     .transform()
-	      //     .removeMark('pinyin')
-	      //     .apply()
-	      // }
+	      if (event.which != code) return;
+	      if (!event.metaKey) {
+	        if (type == "") {
+	          event.preventDefault();
+	          var currentType = state.blocks.get(0).type;
+	          var nextType = typeTransition[currentType];
+	          return state.transform().setBlock(nextType).apply();
+	        } else {
+	          return;
+	        }
+	      }
 	      return state.transform().setBlock(type).apply();
 	    }
 	  };
 	}
 
-	var plugins = [MarkHotkey({ code: 66, type: 'bold' }), MarkHotkey({ code: 73, type: 'italic' }),
+	var plugins = [MarkHotkey({ code: 66, type: 'bold' }), // Key B
+	MarkHotkey({ code: 73, type: 'italic' }), // Key I
 	// MarkHotkey({ code: 68, type: 'strikethrough' }),
-	MarkHotkey({ code: 85, type: 'underline' }), BlockHotkey({ code: 74, type: 'colored_jyutping_paragraph' }), BlockHotkey({ code: 75, type: 'colored_paragraph' })];
+	MarkHotkey({ code: 85, type: 'underline' }), // Key U
+	BlockHotkey({ code: 74, type: 'colored_jyutping_paragraph' }), // Key J
+	BlockHotkey({ code: 75, type: 'colored_paragraph' }), // Key K
+	BlockHotkey({ code: 9, type: '' })];
 
 	var App = function (_React$Component) {
 	  _inherits(App, _React$Component);
@@ -206,11 +215,20 @@
 	            render: function render(props) {
 	              return _react2.default.createElement(
 	                'div',
-	                { className: 'board colored' },
+	                { className: 'board colored no-jyutping' },
 	                props.children
 	              );
 	            },
 	            decorate: paragraphBlockDecorator
+	          },
+	          wrapper: {
+	            render: function render(props) {
+	              return _react2.default.createElement(
+	                'div',
+	                null,
+	                props.children
+	              );
+	            }
 	          }
 	        },
 	        marks: {
@@ -320,27 +338,31 @@
 	      }).then(function (json) {
 	        cantoDict = new _cantonese.CantoDict(json.dictionary);
 	      }).then(function () {
-	        var next = self.state.state.transform().setBlock('line').apply();
-	        self.onChange(next);
-	        next = self.state.state.transform().setBlock('colored_jyutping_paragraph').apply();
-	        self.onChange(next);
-	        console.log(next);
+	        self.refreshDocument(self);
 	      });
 	    }
 	  }, {
+	    key: 'refreshDocument',
+	    value: function refreshDocument(self) {
+	      var next = self.state.state.transform().wrapBlock('wrapper').apply();
+	      self.onChange(next);
+	      next = self.state.state.transform().unwrapBlock('wrapper').apply();
+	      self.onChange(next);
+	    }
+	  }, {
 	    key: 'onHashChange',
-	    value: function onHashChange(parent) {
+	    value: function onHashChange(self) {
 	      var hashContent = decodeURIComponent(location.hash.slice(1));
 	      if (hashContent) {
 	        try {
 	          var stateObj = JSON.parse(hashContent);
 	          var hashState = _slate.Raw.deserialize(stateObj, { terse: true });
-	          parent.onChange(hashState);
+	          self.onChange(hashState);
 	        } catch (err) {
 	          console.warn(err);
 	          var _hashState = _slate.Plain.deserialize(hashContent);
 	          _hashState = _hashState.transform().setBlock('paragraph').apply();
-	          parent.onChange(_hashState);
+	          self.onChange(_hashState);
 	        }
 	      }
 	    }
@@ -78254,7 +78276,7 @@
 		"nodes": [
 			{
 				"kind": "block",
-				"type": "line",
+				"type": "colored_jyutping_paragraph",
 				"nodes": [
 					{
 						"kind": "text",
@@ -78264,6 +78286,12 @@
 			}
 		]
 	};
+
+/***/ },
+/* 405 */
+/***/ function(module, exports) {
+
+	// removed by extract-text-webpack-plugin
 
 /***/ }
 /******/ ]);
