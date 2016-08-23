@@ -2,7 +2,6 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { Editor, Raw, Mark, Plain } from 'slate'
 import { CantoDict, Jyutping, NotedChar } from './cantonese'
-// import * as cantonese_dictionary from './cantonese-dictionary'
 import 'whatwg-fetch'
 import initialState from './state.json'
 
@@ -60,7 +59,6 @@ function MarkHotkey(options) {
 
 function BlockHotkey(options) {
   const { type, code } = options
-  // Return our "plugin" object, containing the `onKeyDown` handler.
   const typeTransition = {
     "line": "colored_jyutping_paragraph",
     "colored_jyutping_paragraph": "colored_paragraph",
