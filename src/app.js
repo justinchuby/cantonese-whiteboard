@@ -31,10 +31,14 @@ function paragraphBlockDecorator(text, block) {
     let notedChar = cantoDict.getNotedChar(string[i], in_str)
     // console.log(notedChar)
     if (notedChar) {
-      let type = `tone_${notedChar.jyutping.tone}`
       // The order of adding marks affects the color of ruby.
-      marks = marks.add(Mark.create({ type: type }))
-      marks = marks.add(Mark.create({ type: "pinyin", data: {notedChar: notedChar} }))
+      if (block.type == "colored_paragraph" || "colored_jyutping_paragraph") {
+        let type = `tone_${notedChar.jyutping.tone}`
+        marks = marks.add(Mark.create({ type: type }))
+      }
+      if (block.type == "jyutping_paragraph" || "colored_jyutping_paragraph") {
+        marks = marks.add(Mark.create({ type: "pinyin", data: {notedChar: notedChar} }))
+      }
       char = char.merge({ marks })
       characters = characters.set(i, char)
     }
@@ -58,11 +62,36 @@ function MarkHotkey(options) {
   }
 }
 
+function BlockHotkey(options) {
+  const { type, code } = options
+  // Return our "plugin" object, containing the `onKeyDown` handler.
+  return {
+    onKeyDown(event, data, state) {
+      // Check that the key pressed matches our `code` option.
+      if (!event.metaKey || event.which != code) return
+      // Toggle the mark `type`.
+      // if (code == 75) {
+      //   state = state
+      //     .transform()
+      //     .removeMark('pinyin')
+      //     .apply()
+      // }
+      // TODO: Could first change it to line type then set it to the desire type
+      return state
+        .transform()
+        .setBlock(type)
+        .apply()
+    }
+  }
+}
+
 const plugins = [
   MarkHotkey({ code: 66, type: 'bold' }),
   MarkHotkey({ code: 73, type: 'italic' }),
   // MarkHotkey({ code: 68, type: 'strikethrough' }),
-  MarkHotkey({ code: 85, type: 'underline' })
+  MarkHotkey({ code: 85, type: 'underline' }),
+  BlockHotkey({ code: 74, type: 'colored_jyutping_paragraph' }),
+  BlockHotkey({ code: 75, type: 'colored_paragraph' }),
 ]
 
 class App extends React.Component {
@@ -70,10 +99,21 @@ class App extends React.Component {
     state: Raw.deserialize(initialState, { terse: true }),
     schema: {
       nodes: {
-        paragraph: {
-          render: props => <div className="board">{props.children}</div>,
+        line: {
+          render: props => <div className="board line">{props.children}</div>,
+        },
+        colored_jyutping_paragraph: {
+          render: props => <div className="board colored jyutping">{props.children}</div>,
           decorate: paragraphBlockDecorator
-        }
+        },
+        colored_paragraph: {
+          render: props => <div className="board colored">{props.children}</div>,
+          decorate: paragraphBlockDecorator
+        },
+        // jyutping_paragraph: {
+        //   render: props => <div className="board jyutping">{props.children}</div>,
+        //   decorate: paragraphBlockDecorator
+        // }
       },
       marks: {
         // props.mark.data.get("notedChar").jyutping.pinyin
@@ -107,15 +147,27 @@ class App extends React.Component {
   componentDidMount() {
     window.addEventListener('hashchange', this.onHashChange(this));
     let fetched = false
-    // var self = this
+    let self = this
     // Load dictionary
     fetch('./data/cantonese-dictionary.json')
       .then(function(response) {
         return response.json()
-      }).then(function(json) {
-        cantoDict = new CantoDict(json.dictionary)
       }).catch(function(ex) {
         console.warn('parsing failed', ex)
+      }).then(function(json) {
+        cantoDict = new CantoDict(json.dictionary)
+      }).then(function() {
+        let next = self.state.state
+          .transform()
+          .setBlock('line')
+          .apply()
+        self.onChange(next)
+        next = self.state.state
+          .transform()
+          .setBlock('colored_jyutping_paragraph')
+          .apply()
+        self.onChange(next)
+        console.log(next)
       })
   }
 

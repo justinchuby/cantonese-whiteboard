@@ -110,10 +110,14 @@
 	    var notedChar = cantoDict.getNotedChar(string[i], in_str);
 	    // console.log(notedChar)
 	    if (notedChar) {
-	      var type = 'tone_' + notedChar.jyutping.tone;
 	      // The order of adding marks affects the color of ruby.
-	      marks = marks.add(_slate.Mark.create({ type: type }));
-	      marks = marks.add(_slate.Mark.create({ type: "pinyin", data: { notedChar: notedChar } }));
+	      if (block.type == "colored_paragraph" || "colored_jyutping_paragraph") {
+	        var type = 'tone_' + notedChar.jyutping.tone;
+	        marks = marks.add(_slate.Mark.create({ type: type }));
+	      }
+	      if (block.type == "jyutping_paragraph" || "colored_jyutping_paragraph") {
+	        marks = marks.add(_slate.Mark.create({ type: "pinyin", data: { notedChar: notedChar } }));
+	      }
 	      char = char.merge({ marks: marks });
 	      characters = characters.set(i, char);
 	    }
@@ -136,9 +140,30 @@
 	  };
 	}
 
+	function BlockHotkey(options) {
+	  var type = options.type;
+	  var code = options.code;
+	  // Return our "plugin" object, containing the `onKeyDown` handler.
+
+	  return {
+	    onKeyDown: function onKeyDown(event, data, state) {
+	      // Check that the key pressed matches our `code` option.
+	      if (!event.metaKey || event.which != code) return;
+	      // Toggle the mark `type`.
+	      // if (code == 75) {
+	      //   state = state
+	      //     .transform()
+	      //     .removeMark('pinyin')
+	      //     .apply()
+	      // }
+	      return state.transform().setBlock(type).apply();
+	    }
+	  };
+	}
+
 	var plugins = [MarkHotkey({ code: 66, type: 'bold' }), MarkHotkey({ code: 73, type: 'italic' }),
 	// MarkHotkey({ code: 68, type: 'strikethrough' }),
-	MarkHotkey({ code: 85, type: 'underline' })];
+	MarkHotkey({ code: 85, type: 'underline' }), BlockHotkey({ code: 74, type: 'colored_jyutping_paragraph' }), BlockHotkey({ code: 75, type: 'colored_paragraph' })];
 
 	var App = function (_React$Component) {
 	  _inherits(App, _React$Component);
@@ -158,11 +183,30 @@
 	      state: _slate.Raw.deserialize(_state2.default, { terse: true }),
 	      schema: {
 	        nodes: {
-	          paragraph: {
+	          line: {
 	            render: function render(props) {
 	              return _react2.default.createElement(
 	                'div',
-	                { className: 'board' },
+	                { className: 'board line' },
+	                props.children
+	              );
+	            }
+	          },
+	          colored_jyutping_paragraph: {
+	            render: function render(props) {
+	              return _react2.default.createElement(
+	                'div',
+	                { className: 'board colored jyutping' },
+	                props.children
+	              );
+	            },
+	            decorate: paragraphBlockDecorator
+	          },
+	          colored_paragraph: {
+	            render: function render(props) {
+	              return _react2.default.createElement(
+	                'div',
+	                { className: 'board colored' },
 	                props.children
 	              );
 	            },
@@ -267,14 +311,20 @@
 	    value: function componentDidMount() {
 	      window.addEventListener('hashchange', this.onHashChange(this));
 	      var fetched = false;
-	      // var self = this
+	      var self = this;
 	      // Load dictionary
 	      fetch('./data/cantonese-dictionary.json').then(function (response) {
 	        return response.json();
-	      }).then(function (json) {
-	        cantoDict = new _cantonese.CantoDict(json.dictionary);
 	      }).catch(function (ex) {
 	        console.warn('parsing failed', ex);
+	      }).then(function (json) {
+	        cantoDict = new _cantonese.CantoDict(json.dictionary);
+	      }).then(function () {
+	        var next = self.state.state.transform().setBlock('line').apply();
+	        self.onChange(next);
+	        next = self.state.state.transform().setBlock('colored_jyutping_paragraph').apply();
+	        self.onChange(next);
+	        console.log(next);
 	      });
 	    }
 	  }, {
@@ -78204,7 +78254,7 @@
 		"nodes": [
 			{
 				"kind": "block",
-				"type": "paragraph",
+				"type": "line",
 				"nodes": [
 					{
 						"kind": "text",
