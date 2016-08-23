@@ -358,7 +358,7 @@
 	        } catch (err) {
 	          console.warn(err);
 	          var _hashState = _slate.Plain.deserialize(hashContent);
-	          _hashState = _hashState.transform().setBlock('paragraph').apply();
+	          _hashState = _hashState.transform().setBlock('colored_jyutping_paragraph').apply();
 	          self.onChange(_hashState);
 	        }
 	      }
