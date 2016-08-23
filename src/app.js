@@ -194,7 +194,7 @@ class App extends React.Component {
         let hashState = Plain.deserialize(hashContent)
         hashState = hashState
           .transform()
-          .setBlock('paragraph')
+          .setBlock('colored_jyutping_paragraph')
           .apply()
         self.onChange(hashState)
       }
