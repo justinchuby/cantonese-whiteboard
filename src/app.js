@@ -61,7 +61,8 @@ function BlockHotkey(options) {
   const { type, code } = options
   const typeTransition = {
     "line": "colored_jyutping_paragraph",
-    "colored_jyutping_paragraph": "colored_paragraph",
+    "colored_jyutping_paragraph": "jyutping_paragraph",
+    "jyutping_paragraph": "colored_paragraph",
     "colored_paragraph": "line"
   }
   return {
@@ -115,13 +116,13 @@ class App extends React.Component {
           render: props => <div className="board colored no-jyutping">{props.children}</div>,
           decorate: paragraphBlockDecorator
         },
+        jyutping_paragraph: {
+          render: props => <div className="board jyutping">{props.children}</div>,
+          decorate: paragraphBlockDecorator
+        },
         wrapper: {
           render: props => <div>{props.children}</div>,
-        },
-        // jyutping_paragraph: {
-        //   render: props => <div className="board jyutping">{props.children}</div>,
-        //   decorate: paragraphBlockDecorator
-        // }
+        }
       },
       marks: {
         // props.mark.data.get("notedChar").jyutping.pinyin
