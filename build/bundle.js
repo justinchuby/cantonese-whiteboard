@@ -141,7 +141,8 @@
 
 	  var typeTransition = {
 	    "line": "colored_jyutping_paragraph",
-	    "colored_jyutping_paragraph": "colored_paragraph",
+	    "colored_jyutping_paragraph": "jyutping_paragraph",
+	    "jyutping_paragraph": "colored_paragraph",
 	    "colored_paragraph": "line"
 	  };
 	  return {
@@ -213,6 +214,16 @@
 	              return _react2.default.createElement(
 	                'div',
 	                { className: 'board colored no-jyutping' },
+	                props.children
+	              );
+	            },
+	            decorate: paragraphBlockDecorator
+	          },
+	          jyutping_paragraph: {
+	            render: function render(props) {
+	              return _react2.default.createElement(
+	                'div',
+	                { className: 'board jyutping' },
 	                props.children
 	              );
 	            },
