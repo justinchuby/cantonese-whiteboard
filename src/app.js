@@ -166,9 +166,7 @@ class App extends React.Component {
     window.location.hash = "#" + encodedContent
   }
 
-  componentDidMount() {
-    window.addEventListener('hashchange', this.onHashChange(this));
-    let fetched = false
+  componentWillMount() {
     let self = this
     // Load dictionary
     fetch('./data/cantonese-dictionary.json')
@@ -181,6 +179,10 @@ class App extends React.Component {
       }).then(function() {
         self.refreshDocument(self)
       })
+  }
+
+  componentDidMount() {
+  	window.addEventListener('hashchange', this.onHashChange(this));
   }
 
   refreshDocument(self) {
@@ -223,6 +225,7 @@ class App extends React.Component {
         plugins={plugins}
         onChange={this.onChange}
         onDocumentChange={(document, state) => this.onDocumentChange(document, state)}
+        componentWillMount={this.componentWillMount}
         componentDidMount={this.componentDidMount}
       />
     )
