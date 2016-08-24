@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom'
 import { Editor, Raw, Mark, Plain } from 'slate'
 import { CantoDict, Jyutping, NotedChar } from './cantonese'
 import 'whatwg-fetch'
-import initialState from './state.json'
 
 let cantoDict = new CantoDict("")
 
@@ -100,9 +99,23 @@ const plugins = [
   BlockHotkey({ code: 9, type: '' }), // Key Tab
 ]
 
+function getInitialState() {
+  try {
+    return customInitialState
+  } catch (err) {
+    console.warn(err, "No customInitialState defined in page. Using default.")
+    const initialState = {"nodes":[{"kind":"block",
+                                    "type":"colored_jyutping_paragraph",
+                                      "nodes":[{"kind":"text","text":""}]}]}
+    return initialState
+  }
+}
+
+
 class App extends React.Component {
   state = {
-    state: Raw.deserialize(initialState, { terse: true }),
+    state: Raw.deserialize(getInitialState(), { terse: true }),
+    // customInitialState defined in the HTML page.
     schema: {
       nodes: {
         line: {

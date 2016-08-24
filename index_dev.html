@@ -3,10 +3,26 @@
   <head>
     <title>粤语注音白板 | Cantonese Whiteboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta charset="UTF-8">
+    <meta name="description" content="粤语注音白板 | Cantonese Whiteboard">
+    <meta name="author" content="Justin Chu">
     <link rel="stylesheet" href="./build/style.css">
   </head>
   <body>
     <div id="app"></div>
+    <script type="text/javascript">
+      var customInitialState = {
+        "nodes": [{
+          "kind": "block",
+          "type": "colored_jyutping_paragraph",
+          "nodes": [{
+            "kind": "text",
+            "text": "粤语注音白板"
+          }]
+        }]
+      };
+    </script>
+    <script async src="https://cdn.polyfill.io/v2/polyfill.min.js?features=Element.prototype.closest"></script>
     <script src="build/bundle.js"></script>
   </body>
 </html>
