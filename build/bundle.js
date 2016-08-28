@@ -137,9 +137,10 @@
 
 	  var typeTransition = {
 	    "line": "colored_jyutping_paragraph",
-	    "colored_jyutping_paragraph": "jyutping_paragraph",
-	    "jyutping_paragraph": "colored_paragraph",
-	    "colored_paragraph": "line"
+	    "colored_jyutping_paragraph": "mono_jyutping_paragraph",
+	    "mono_jyutping_paragraph": "colored_paragraph",
+	    "colored_paragraph": "jyutping_paragraph",
+	    "jyutping_paragraph": "line"
 	  };
 	  return {
 	    onKeyDown: function onKeyDown(event, data, state) {
@@ -228,11 +229,21 @@
 	            },
 	            decorate: paragraphBlockDecorator
 	          },
-	          jyutping_paragraph: {
+	          mono_jyutping_paragraph: {
 	            render: function render(props) {
 	              return _react2.default.createElement(
 	                'div',
 	                { className: 'board jyutping' },
+	                props.children
+	              );
+	            },
+	            decorate: paragraphBlockDecorator
+	          },
+	          jyutping_paragraph: {
+	            render: function render(props) {
+	              return _react2.default.createElement(
+	                'div',
+	                { className: 'board jyutping no-char' },
 	                props.children
 	              );
 	            },
@@ -253,42 +264,42 @@
 	          tone_1: function tone_1(props) {
 	            return _react2.default.createElement(
 	              'span',
-	              { className: 'tone-1' },
+	              { className: 'toned tone-1' },
 	              props.children
 	            );
 	          },
 	          tone_2: function tone_2(props) {
 	            return _react2.default.createElement(
 	              'span',
-	              { className: 'tone-2' },
+	              { className: 'toned tone-2' },
 	              props.children
 	            );
 	          },
 	          tone_3: function tone_3(props) {
 	            return _react2.default.createElement(
 	              'span',
-	              { className: 'tone-3' },
+	              { className: 'toned tone-3' },
 	              props.children
 	            );
 	          },
 	          tone_4: function tone_4(props) {
 	            return _react2.default.createElement(
 	              'span',
-	              { className: 'tone-4' },
+	              { className: 'toned tone-4' },
 	              props.children
 	            );
 	          },
 	          tone_5: function tone_5(props) {
 	            return _react2.default.createElement(
 	              'span',
-	              { className: 'tone-5' },
+	              { className: 'toned tone-5' },
 	              props.children
 	            );
 	          },
 	          tone_6: function tone_6(props) {
 	            return _react2.default.createElement(
 	              'span',
-	              { className: 'tone-6' },
+	              { className: 'toned tone-6' },
 	              props.children
 	            );
 	          },
