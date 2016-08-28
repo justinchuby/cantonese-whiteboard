@@ -33,3 +33,6 @@ ruby {
 
 .no-jyutping rt {
   display: none; }
+
+.no-char .toned {
+  display: none; }

@@ -60,9 +60,10 @@ function BlockHotkey(options) {
   const { type, code } = options
   const typeTransition = {
     "line": "colored_jyutping_paragraph",
-    "colored_jyutping_paragraph": "jyutping_paragraph",
-    "jyutping_paragraph": "colored_paragraph",
-    "colored_paragraph": "line"
+    "colored_jyutping_paragraph": "mono_jyutping_paragraph",
+    "mono_jyutping_paragraph": "colored_paragraph",
+    "colored_paragraph": "jyutping_paragraph",
+    "jyutping_paragraph": "line"
   }
   return {
     onKeyDown(event, data, state) {
@@ -129,8 +130,12 @@ class App extends React.Component {
           render: props => <div className="board colored no-jyutping">{props.children}</div>,
           decorate: paragraphBlockDecorator
         },
-        jyutping_paragraph: {
+        mono_jyutping_paragraph: {
           render: props => <div className="board jyutping">{props.children}</div>,
+          decorate: paragraphBlockDecorator
+        },
+        jyutping_paragraph: {
+          render: props => <div className="board jyutping no-char">{props.children}</div>,
           decorate: paragraphBlockDecorator
         },
         wrapper: {
@@ -139,12 +144,12 @@ class App extends React.Component {
       },
       marks: {
         // props.mark.data.get("notedChar").jyutping.pinyin
-        tone_1: props => <span className="tone-1">{props.children}</span>,
-        tone_2: props => <span className="tone-2">{props.children}</span>,
-        tone_3: props => <span className="tone-3">{props.children}</span>,
-        tone_4: props => <span className="tone-4">{props.children}</span>,
-        tone_5: props => <span className="tone-5">{props.children}</span>,
-        tone_6: props => <span className="tone-6">{props.children}</span>,
+        tone_1: props => <span className="toned tone-1">{props.children}</span>,
+        tone_2: props => <span className="toned tone-2">{props.children}</span>,
+        tone_3: props => <span className="toned tone-3">{props.children}</span>,
+        tone_4: props => <span className="toned tone-4">{props.children}</span>,
+        tone_5: props => <span className="toned tone-5">{props.children}</span>,
+        tone_6: props => <span className="toned tone-6">{props.children}</span>,
         pinyin: props => <ruby>{props.children}<rt>{props.mark.data.get("notedChar").jyutping.pinyin}</rt></ruby>,
         bold: props => <strong>{props.children}</strong>,
         italic: props => <em>{props.children}</em>,
@@ -166,9 +171,7 @@ class App extends React.Component {
     window.location.hash = "#" + encodedContent
   }
 
-  componentDidMount() {
-    window.addEventListener('hashchange', this.onHashChange(this));
-    let fetched = false
+  componentWillMount() {
     let self = this
     // Load dictionary
     fetch('./data/cantonese-dictionary.json')
@@ -181,6 +184,10 @@ class App extends React.Component {
       }).then(function() {
         self.refreshDocument(self)
       })
+  }
+
+  componentDidMount() {
+  	window.addEventListener('hashchange', this.onHashChange(this));
   }
 
   refreshDocument(self) {
@@ -223,6 +230,7 @@ class App extends React.Component {
         plugins={plugins}
         onChange={this.onChange}
         onDocumentChange={(document, state) => this.onDocumentChange(document, state)}
+        componentWillMount={this.componentWillMount}
         componentDidMount={this.componentDidMount}
       />
     )
