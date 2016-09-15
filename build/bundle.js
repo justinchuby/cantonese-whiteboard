@@ -77602,6 +77602,15 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+	function jyut_to_cpinyin(pinyin) {
+	  // 转换粤拼到教育学院拼音
+	  pinyin = pinyin.replace(/^z/i, "dz");
+	  pinyin = pinyin.replace(/^c/i, "ts");
+	  pinyin = pinyin.replace(/yu/i, "y");
+	  pinyin = pinyin.replace(/eoi/i, "eoy");
+	  return pinyin;
+	}
+
 	var Jyutping = function Jyutping(pinyin) {
 	  _classCallCheck(this, Jyutping);
 
@@ -77814,7 +77823,7 @@
 	    var pinyin = _splitedLine[1];
 	    var extra = _splitedLine[2];
 
-	    var notedChar = new NotedChar({ char: char, pinyin: pinyin });
+	    var notedChar = new NotedChar({ char: char, pinyin: jyut_to_cpinyin(pinyin) });
 	    var use_cases = null;
 	    var explanations = null;
 	    if (extra) {

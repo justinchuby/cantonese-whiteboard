@@ -1,3 +1,12 @@
+function jyut_to_cpinyin(pinyin) {
+	// 转换粤拼到教育学院拼音
+	pinyin = pinyin.replace(/^z/i, "dz");
+	pinyin = pinyin.replace(/^c/i, "ts");
+	pinyin = pinyin.replace(/yu/i, "y");
+	pinyin = pinyin.replace(/eoi/i, "eoy");
+	return pinyin
+}
+
 class Jyutping {
   constructor(pinyin) {
     this.pinyin = pinyin
@@ -138,7 +147,7 @@ function parse_line(line) {
   let splitedLine = line.split("\t")
   if (splitedLine.length == 3) {
     let [char, pinyin, extra] = splitedLine
-    let notedChar = new NotedChar({char: char, pinyin: pinyin})
+    let notedChar = new NotedChar({char: char, pinyin: jyut_to_cpinyin(pinyin)})
     let use_cases = null
     let explanations = null
     if (extra) {
