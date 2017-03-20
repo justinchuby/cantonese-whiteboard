@@ -12,4 +12,4 @@ Cantonese whiteboard helps you learn Cantonese. Input Chinese characters in the 
 
 ## About the app
 
-Cantonese Whiteboard is built with [Slate](https://github.com/ianstormtaylor/slate), React, and code from project [CoolCantonese](https://github.com/kk17/CoolCantonese)
+Cantonese Whiteboard is built with [Slate](https://github.com/ianstormtaylor/slate) (0.13.6), React, and code from project [CoolCantonese](https://github.com/kk17/CoolCantonese)
